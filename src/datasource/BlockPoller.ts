@@ -7,6 +7,13 @@ interface LastSyncedHeightRepository {
   save(height: number): Promise<void>;
 }
 
+export const createStaticLastSyncedHeightRepository = (initialHeight: number): LastSyncedHeightRepository => ({
+  async load(): Promise<number> {
+    return initialHeight;
+  },
+  async save(height: number): Promise<void> {},
+});
+
 export interface BlockPollerOptions {
   intervalInMs: number;
   maxRetry: number;
