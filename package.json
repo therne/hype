@@ -5,7 +5,6 @@
   "repository": "https://github.com/pylon-protocol/hype.git",
   "author": "Pylon Team",
   "license": "MIT",
-  "private": true,
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
