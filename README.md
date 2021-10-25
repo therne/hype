@@ -9,6 +9,8 @@ An experimental indexer framework. Allows subscribing on-chain events from Terra
 
 ## Example
 
+### Indexing CW20 Transfer Logs in Real-Time
+
 ```ts
 const datasource = new BlockPoller(
   new HiveBlockFetcher('https://hive.terra.dev/graphql'),
@@ -48,5 +50,17 @@ hype.register({
 });
 
 hype.start();
+```
 
+### Indexing Specific Range of Blocks
+
+```ts
+const datasource = new BlockBackFiller(
+  new HiveBlockFetcher('https://hive.terra.dev/graphql'),
+  4980471, 4981423,
+);
+const hype = new Hype(datasource);
+
+hype.register({ id: 'cw20-transfer',...});
+hype.start();
 ```
