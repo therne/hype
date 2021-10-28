@@ -23,6 +23,7 @@
     "strictPropertyInitialization": true,
     "target": "es5",
     "strict": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "esModuleInterop": true
   },

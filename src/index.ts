@@ -1,5 +1,5 @@
 export * from './block';
 export * from './block-fetcher';
 export * from './datasource';
-export * from './indexer';
-export * from './options';
+export * from './Hype';
+export { Logger, setHypeLogger } from './logger';

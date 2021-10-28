@@ -2,6 +2,7 @@ import { Block, Hype } from "../src";
 import fixtureBlock from "./fixtures/5036118.json";
 import { createStaticBlockDataSource } from "../src/datasource/BlockDataSource";
 import { createReturningLogFinder } from "@terra-money/log-finder";
+import { findAndParseEvents } from "../src/extensions/log-finder";
 
 interface ClaimAirdropLog {
   address: string;
@@ -17,10 +18,9 @@ describe('Testing Hype', () => {
     transactions: fixtureBlock.transactions,
   }
   const hype = new Hype(createStaticBlockDataSource([block]));
-  const capturedOutputs: ClaimAirdropLog[] = [];
-  hype.subscribe({
-    id: 'pylon-buyback',
-    logFinders: [
+  let capturedOutputs: ClaimAirdropLog[] = [];
+  hype.subscribe('pylon-buyback', async (block: Block) => {
+    capturedOutputs = findAndParseEvents(block, [
       createReturningLogFinder(
         {
           type: 'from_contract',
@@ -38,14 +38,7 @@ describe('Testing Hype', () => {
           amount: match[4].value,
         }),
       ),
-    ],
-    async indexer(input: ClaimAirdropLog): Promise<ClaimAirdropLog[]> {
-      return [input];
-    },
-    async postIndexerHook(outputs: ClaimAirdropLog[]) {
-      console.log(outputs);
-      capturedOutputs.push(...outputs);
-    }
+    ]);
   });
 
   it('should start', async () => {

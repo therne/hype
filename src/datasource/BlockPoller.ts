@@ -1,18 +1,7 @@
 import { Block } from '../block';
 import { BlockFetcher } from '../block-fetcher';
 import BlockDataSource from './BlockDataSource';
-
-interface LastSyncedHeightRepository {
-  load(): Promise<number>;
-  save(height: number): Promise<void>;
-}
-
-export const createStaticLastSyncedHeightRepository = (initialHeight: number): LastSyncedHeightRepository => ({
-  async load(): Promise<number> {
-    return initialHeight;
-  },
-  async save(height: number): Promise<void> {},
-});
+import { LastSyncedHeightRepository } from './LastSyncedHeightRepository';
 
 export interface BlockPollerOptions {
   intervalInMs: number;
