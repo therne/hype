@@ -48,4 +48,22 @@ describe('Testing Hype', () => {
       expect(capturedOutputs).toHaveLength(1);
     });
   });
+
+  describe('eventHandlers()', () => {
+    test('on error, it should catch errors from subscriber', async () => {
+      let capture: {err: Error, subscriptionId: string, block: Block} | undefined;
+      hype.on('error', (err, subscriptionId, block) => {
+        capture = { err, subscriptionId, block };
+      });
+
+      hype.subscribe('error-maker', async () => {
+        throw new Error('no luck, man');
+      });
+      await hype.start();
+
+      expect(capture).toBeTruthy();
+      expect(capture?.err.message).toBe('no luck, man');
+      expect(capture?.subscriptionId).toBe('error-maker');
+    });
+  });
 });

@@ -45,7 +45,12 @@ export class Hype extends TypedEmitter<HypeEvents> {
 
       for (const [id, subscriber] of Object.entries(this.subscriptions)) {
         this.emit('callSubscriber', id, block);
-        await subscriber(block, id);
+        try {
+          await subscriber(block, id);
+        } catch (err) {
+          this.emit('error', err as Error, id, block);
+          continue;
+        }
         this.emit('postCallSubscriber', id, block);
       }
 
