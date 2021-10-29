@@ -19,7 +19,7 @@ export default class BlockPoller implements BlockDataSource {
   constructor(
     public blockFetcher: BlockFetcher,
     public lastSyncedHeightRepository: LastSyncedHeightRepository,
-    options: Partial<BlockPollerOptions>,
+    options: Partial<BlockPollerOptions> = {},
   ) {
     this.options = Object.assign(defaultBlockPollerOptions, options);
   }
