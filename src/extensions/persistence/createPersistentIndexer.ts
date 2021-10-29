@@ -21,7 +21,7 @@ export function createPersistentIndexer<T>(
     await entity.save(outputs);
 
     const logMsg = outputs.length === 0 ? 'no results' : 'saved results';
-    log(subscriptionId, logMsg, {
+    log('info', subscriptionId, logMsg, {
       height: block.height,
       outputCount: outputs.length,
       elapsedMs: Date.now() - start,

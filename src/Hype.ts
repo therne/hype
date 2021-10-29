@@ -20,9 +20,16 @@ export class Hype extends TypedEmitter<HypeEvents> {
     super();
 
     this.on('block', (block) => {
-      log('block-poller', 'processing block', {
+      log('trace', 'hype', 'processing block', {
         height: block.height,
         blockTimestamp: block.timestamp.toISOString(),
+      });
+    });
+    this.on('error', (err, subscriptionId, block) => {
+      log('error', subscriptionId, 'error', {
+        height: block.height,
+        blockTimestamp: block.timestamp.toISOString(),
+        error: err.stack,
       });
     });
   }
