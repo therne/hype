@@ -43,16 +43,17 @@ export class Hype extends TypedEmitter<HypeEvents> {
     for await (const block of this.dataSource.blocks()) {
       this.emit('block', block);
 
-      for (const [id, subscriber] of Object.entries(this.subscriptions)) {
-        this.emit('callSubscriber', id, block);
-        try {
-          await subscriber(block, id);
-        } catch (err) {
-          this.emit('error', err as Error, id, block);
-          continue;
-        }
-        this.emit('postCallSubscriber', id, block);
-      }
+      await Promise.all(
+        Object.entries(this.subscriptions).map(async ([id, subscriber]) => {
+          try {
+            this.emit('callSubscriber', id, block);
+            await subscriber(block, id);
+            this.emit('postCallSubscriber', id, block);
+          } catch (err) {
+            this.emit('error', err as Error, id, block);
+          }
+        }),
+      );
 
       this.emit('postBlock', block);
     }
