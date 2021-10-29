@@ -1,5 +1,6 @@
 dist/
 build/
+lib/
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,macos,windows,intellij+all,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,macos,windows,intellij+all,visualstudiocode
