@@ -74,7 +74,7 @@ export class HiveBlockFetcher implements BlockFetcher {
       const transactions = data.tx.byHeight;
 
       // use timestamp in first txn or fetch block header
-      const timestamp = transactions[0].timestamp
+      const timestamp = transactions.length > 0
         ? new Date(transactions[0].timestamp)
         : await this.fetchBlockTimestamp(height);
 
