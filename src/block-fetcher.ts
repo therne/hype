@@ -36,7 +36,7 @@ interface FetchBlockQueryResponse {
 }
 
 const FETCH_BLOCK_HEADER_QUERY = gql`
-  query ($height: Float!) {
+  query ($height: Int) {
     tendermint {
       blockInfo(height: $height) {
         block {
