@@ -2,6 +2,7 @@ import { Block } from '../block';
 import { BlockFetcher } from '../block-fetcher';
 import BlockDataSource from './BlockDataSource';
 import { LastSyncedHeightRepository } from './LastSyncedHeightRepository';
+import { log } from '../logger';
 
 export interface BlockPollerOptions {
   intervalInMs: number;
@@ -34,6 +35,11 @@ export default class BlockPoller implements BlockDataSource {
       if (!block) {
         throw new Error(`block ${height} not available`);
       }
+      log('trace', 'block-poller', 'polled block', {
+        height: block.height,
+        timestamp: block.timestamp,
+        syncLagMs: Date.now() - +block.timestamp,
+      });
       yield block;
       await this.lastSyncedHeightRepository.save(height);
     }
