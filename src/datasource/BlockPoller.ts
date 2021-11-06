@@ -9,8 +9,8 @@ export interface BlockPollerOptions {
 }
 
 const defaultBlockPollerOptions: BlockPollerOptions = {
-  intervalInMs: 7000,
-  maxRetry: 3,
+  intervalInMs: 5000,
+  maxRetry: 20,
 };
 
 export default class BlockPoller implements BlockDataSource {
@@ -28,8 +28,8 @@ export default class BlockPoller implements BlockDataSource {
     const lastSyncedHeight = await this.lastSyncedHeightRepository.load();
 
     for (let height = lastSyncedHeight + 1; ; height++) {
-      const block = await withRetry(this.options.maxRetry, () =>
-        withDelay(this.options.intervalInMs, () => this.blockFetcher.fetchBlockAt(height)),
+      const block = await withRetryAndDelay(this.options.maxRetry, this.options.intervalInMs, () =>
+        this.blockFetcher.fetchBlockAt(height),
       );
       if (!block) {
         throw new Error(`block ${height} not available`);
@@ -40,19 +40,18 @@ export default class BlockPoller implements BlockDataSource {
   }
 }
 
-async function withRetry<T>(maxAttempts: number, fn: () => Promise<T>): Promise<T | undefined> {
+async function withRetryAndDelay<T>(
+  maxAttempts: number,
+  delayMs: number,
+  fn: () => Promise<T>,
+): Promise<T | undefined> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const val = await fn();
     if (val == null) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
       continue;
     }
     return val;
   }
   return;
-}
-
-async function withDelay<T>(ms: number, fn: () => Promise<T>): Promise<T> {
-  const val = await fn();
-  await new Promise((resolve) => setTimeout(resolve, ms));
-  return val;
 }
