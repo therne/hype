@@ -74,9 +74,8 @@ export class HiveBlockFetcher implements BlockFetcher {
       const transactions = data.tx.byHeight;
 
       // use timestamp in first txn or fetch block header
-      const timestamp = transactions.length > 0
-        ? new Date(transactions[0].timestamp)
-        : await this.fetchBlockTimestamp(height);
+      const timestamp =
+        transactions.length > 0 ? new Date(transactions[0].timestamp) : await this.fetchBlockTimestamp(height);
 
       return {
         height,
@@ -97,6 +96,10 @@ export class HiveBlockFetcher implements BlockFetcher {
   }
 
   isBlockNotFoundError(err: ClientError): boolean {
-    return !!(err?.response?.errors && err.response.errors[0].message === 'Request failed with status code 500');
+    return !!(
+      err?.response?.errors &&
+      (err.response.errors[0].message === 'Request failed with status code 500' ||
+        err.response.errors[0].message.toLowerCase().includes('not found'))
+    );
   }
 }
