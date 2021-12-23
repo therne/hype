@@ -1,5 +1,6 @@
 import { ClientError, gql, GraphQLClient } from 'graphql-request';
 import { Block, Txn } from './block';
+import { log } from './logger';
 
 export interface BlockFetcher {
   fetchBlockAt(height: number): Promise<Block | undefined>;
@@ -86,7 +87,11 @@ export class HiveBlockFetcher implements BlockFetcher {
       if (this.isBlockNotFoundError(err as ClientError)) {
         return;
       }
-      throw err;
+      log('error', 'hive-block-fetcher', 'failed to fetch block from hive', {
+        height,
+        error: (err as ClientError)?.response?.errors ?? err,
+      });
+      return;
     }
   }
 
