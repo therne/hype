@@ -65,7 +65,7 @@ export const loadTransactionsOfAccount = (
           for (const block of blocks) {
             yield block;
           }
-          if (blocks.length > 0) {
+          if (blocks.length === 0) {
             await sleep(sleepMs);
           }
           currentOffset = next;
@@ -80,10 +80,8 @@ export const loadTransactionsOfAccount = (
           log('error', 'fcd-backfiller', `load failed`, { offset: currentOffset, error });
           retry++;
 
-          if (error.includes('429')) {
-            // retry backoff
-            await sleep(sleepMs * retry);
-          }
+          // retry backoff
+          await sleep(sleepMs * retry);
         }
       }
     },
