@@ -12,28 +12,38 @@ interface FCDResponse {
   txs: Txn[];
 }
 
-const DEFAULT_SLEEP_MS = 1000;
-
 export interface LoadTransactionsOfAccountOptions {
-  fromBlock?: number;
-  toBlock?: number;
-  sleepMs?: number;
+  endpoint: string;
+  fromBlock: number;
+  toBlock: number;
+  sleepMs: number;
+  offset: number;
+  limit: number;
 }
+
+const defaultOptions: LoadTransactionsOfAccountOptions = {
+  endpoint: FCD_MAINNET,
+  fromBlock: 0,
+  toBlock: Number.MAX_VALUE,
+  sleepMs: 1000,
+  offset: 0,
+  limit: 100,
+};
 
 export const loadTransactionsOfAccount = (
   account: string,
-  endpoint = FCD_MAINNET,
-  options: LoadTransactionsOfAccountOptions = {},
+  options: Partial<LoadTransactionsOfAccountOptions> = {},
 ): BlockDataSource => {
+  const { endpoint, fromBlock, toBlock, sleepMs, offset, limit } = Object.assign(options, defaultOptions);
+
   return {
     async *blocks(): AsyncGenerator<Block> {
-      let offset: number | undefined = 0;
+      let currentOffset: number | undefined = offset;
       let page = 0;
-      const limit = 100;
-      while (offset != null) {
-        log('info', 'fcd-backfiller', `loading page ${page}`, { offset });
+      while (currentOffset != null) {
+        log('info', 'fcd-backfiller', `loading page #${page}`, { offset: currentOffset });
 
-        const resp = await axios.get(`${endpoint}/v1/txs?offset=${offset}&limit=${limit}&account=${account}`);
+        const resp = await axios.get(`${endpoint}/v1/txs?offset=${currentOffset}&limit=${limit}&account=${account}`);
         const { next, txs } = resp.data as FCDResponse;
         if (txs.length === 0) {
           return;
@@ -46,21 +56,13 @@ export const loadTransactionsOfAccount = (
             height: Number(transactions[0].height),
             transactions,
           }))
-          .filter(({ height }) => {
-            if (options.fromBlock) {
-              return height >= options.fromBlock;
-            }
-            if (options.toBlock) {
-              return height < options.toBlock;
-            }
-            return true;
-          });
+          .filter(({ height }) => fromBlock <= height && height < toBlock);
 
         for (const block of blocks) {
           yield block;
         }
-        await sleep(options.sleepMs ?? DEFAULT_SLEEP_MS);
-        offset = next;
+        await sleep(sleepMs);
+        currentOffset = next;
         page++;
       }
     },
