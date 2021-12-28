@@ -2,7 +2,7 @@ import BlockDataSource from './BlockDataSource';
 import { Block, Txn } from '../block';
 import { log } from '../logger';
 import axios from 'axios';
-import { groupBy } from 'lodash';
+import { every, groupBy } from 'lodash';
 
 const FCD_MAINNET = 'https://fcd.terra.dev';
 
@@ -54,18 +54,21 @@ export const loadTransactionsOfAccount = (
           }
 
           // group transactions in the account as a virtual block
-          const blocks = Object.values(groupBy(txs, 'height'))
-            .map((transactions) => ({
-              timestamp: new Date(transactions[0].timestamp),
-              height: Number(transactions[0].height),
-              transactions,
-            }))
-            .filter(({ height }) => fromBlock <= height && height < toBlock);
+          const blocks = Object.values(groupBy(txs, 'height')).map((transactions) => ({
+            timestamp: new Date(transactions[0].timestamp),
+            height: Number(transactions[0].height),
+            transactions,
+          }));
 
-          for (const block of blocks) {
+          if (every(blocks, ({ height }) => height < fromBlock)) {
+            return;
+          }
+
+          const blocksInRange = blocks.filter(({ height }) => fromBlock <= height && height < toBlock);
+          for (const block of blocksInRange) {
             yield block;
           }
-          if (blocks.length === 0) {
+          if (blocksInRange.length === 0) {
             await sleep(sleepMs);
           }
           currentOffset = next;

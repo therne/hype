@@ -1,6 +1,6 @@
 {
   "name": "@pylon-protocol/hype",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "On-chain Event Subscriber Framework for Terra Blockchain",
   "repository": "https://github.com/pylon-protocol/hype.git",
   "author": "Pylon Team",
