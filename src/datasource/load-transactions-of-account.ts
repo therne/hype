@@ -19,6 +19,7 @@ export interface LoadTransactionsOfAccountOptions {
   sleepMs: number;
   offset: number;
   limit: number;
+  maxRetry: number;
 }
 
 const defaultOptions: LoadTransactionsOfAccountOptions = {
@@ -28,42 +29,62 @@ const defaultOptions: LoadTransactionsOfAccountOptions = {
   sleepMs: 1000,
   offset: 0,
   limit: 100,
+  maxRetry: 5,
 };
 
 export const loadTransactionsOfAccount = (
   account: string,
   options: Partial<LoadTransactionsOfAccountOptions> = {},
 ): BlockDataSource => {
-  const { endpoint, fromBlock, toBlock, sleepMs, offset, limit } = Object.assign(options, defaultOptions);
+  const { endpoint, fromBlock, toBlock, sleepMs, offset, limit, maxRetry } = Object.assign(options, defaultOptions);
 
   return {
     async *blocks(): AsyncGenerator<Block> {
       let currentOffset: number | undefined = offset;
       let page = 0;
+      let retry = 0;
       while (currentOffset != null) {
-        log('info', 'fcd-backfiller', `loading page #${page}`, { offset: currentOffset });
+        try {
+          log('info', 'fcd-backfiller', `loading page #${page}`, { offset: currentOffset });
 
-        const resp = await axios.get(`${endpoint}/v1/txs?offset=${currentOffset}&limit=${limit}&account=${account}`);
-        const { next, txs } = resp.data as FCDResponse;
-        if (txs.length === 0) {
-          return;
+          const resp = await axios.get(`${endpoint}/v1/txs?offset=${currentOffset}&limit=${limit}&account=${account}`);
+          const { next, txs } = resp.data as FCDResponse;
+          if (txs.length === 0) {
+            return;
+          }
+
+          // group transactions in the account as a virtual block
+          const blocks = Object.values(groupBy(txs, 'height'))
+            .map((transactions) => ({
+              timestamp: new Date(transactions[0].timestamp),
+              height: Number(transactions[0].height),
+              transactions,
+            }))
+            .filter(({ height }) => fromBlock <= height && height < toBlock);
+
+          for (const block of blocks) {
+            yield block;
+          }
+          if (blocks.length > 0) {
+            await sleep(sleepMs);
+          }
+          currentOffset = next;
+          page++;
+          retry = 0;
+        } catch (err) {
+          if (retry >= maxRetry) {
+            log('error', 'fcd-backfiller', `max retry attempt ${maxRetry} exceeded`, {});
+            throw err;
+          }
+          const error = (err as Error).message;
+          log('error', 'fcd-backfiller', `load failed`, { offset: currentOffset, error });
+          retry++;
+
+          if (error.includes('429')) {
+            // retry backoff
+            await sleep(sleepMs * retry);
+          }
         }
-
-        // group transactions in the account as a virtual block
-        const blocks = Object.values(groupBy(txs, 'height'))
-          .map((transactions) => ({
-            timestamp: new Date(transactions[0].timestamp),
-            height: Number(transactions[0].height),
-            transactions,
-          }))
-          .filter(({ height }) => fromBlock <= height && height < toBlock);
-
-        for (const block of blocks) {
-          yield block;
-        }
-        await sleep(sleepMs);
-        currentOffset = next;
-        page++;
       }
     },
   };
