@@ -36,7 +36,7 @@ export const loadTransactionsOfAccount = (
   account: string,
   options: Partial<LoadTransactionsOfAccountOptions> = {},
 ): BlockDataSource => {
-  const { endpoint, fromBlock, toBlock, sleepMs, offset, limit, maxRetry } = Object.assign(options, defaultOptions);
+  const { endpoint, fromBlock, toBlock, sleepMs, offset, limit, maxRetry } = Object.assign(defaultOptions, options);
 
   return {
     async *blocks(): AsyncGenerator<Block> {
