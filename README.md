@@ -13,8 +13,8 @@ An experimental indexer framework. Allows subscribing on-chain events from Terra
 
 ```ts
 const datasource = new BlockPoller(
-  new HiveBlockFetcher(),
-  saveLastSyncedHeightInHivePersistence(new DynamoDBDriver({ ... })),
+  new LCDBlockFetcher(),
+  saveLastSyncedHeightInHivePersistence(new DynamoDBDriver({...})),
 );
 
 const hype = new Hype(datasource);
