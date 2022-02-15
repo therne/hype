@@ -2,6 +2,7 @@ import { Block, createStaticBlockDataSource, Hype } from '../src';
 import fixtureBlock from './fixtures/5036118.json';
 import { createReturningLogFinder } from '@terra-money/log-finder';
 import { findAndParseEvents } from '../src/extensions/log-finder';
+import { loadFixtureBlock } from './test-utils';
 
 interface ClaimAirdropLog {
   address: string;
@@ -10,12 +11,7 @@ interface ClaimAirdropLog {
 }
 
 describe('Testing Hype', () => {
-  const block: Block = {
-    height: fixtureBlock.height,
-    timestamp: new Date(fixtureBlock.timestamp),
-    // @ts-ignore
-    transactions: fixtureBlock.transactions,
-  };
+  const block = loadFixtureBlock(fixtureBlock);
   const hype = new Hype(createStaticBlockDataSource([block]));
 
   describe('start()', () => {
