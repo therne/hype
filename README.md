@@ -1,13 +1,29 @@
-Hype
-======
+![Hype](./docs/Hype-Logo.svg)
 
 An experimental indexer framework. Allows subscribing on-chain events from Terra Blockchain.
 
 ## Architecture Overview
 
-![Hype Diagram](./docs/Hype-Diagram.png)
+![Hype Diagram](./docs/Hype-Diagram.svg)
 
 ## Example
+
+### Subscribing CW20 Transfers in Real-Time
+
+```ts
+const hype = await createRealtimeHype();
+const ancTransferFinder = createCw20TransferLogFinder('terra1747mad58h0w4y589y3sk84r5efqdev9q4r02pc');
+
+hype.subscribe('anchor-transfer', async (block) => {
+  extractEventsInBlock(block, [ancTransferFinder])
+    .forEach(({ txHash, event: { from, to, amount } }) => {
+      console.log(`Transfer ${amount} ANC from ${from} to ${to}`);
+      console.log(` -> https://finder.terra.money/mainnet/tx/${txHash}`);
+    });
+});
+
+await hype.start();
+```
 
 ### Indexing CW20 Transfer Logs in Real-Time
 
@@ -18,8 +34,10 @@ const datasource = new BlockPoller(
 );
 
 const hype = new Hype(datasource);
-hype.subscribe('cw20-transfer', createPersistentIndexer(Cw20TransferLog, async (block) => {
-    return findAndParseEvents(block, [
+hype.subscribe(
+  'cw20-transfer',
+  createPersistentIndexer(Cw20TransferLog, async (block) =>
+    extractEventsInBlock(block, [
       createReturningLogFinderRule(
         {
           type: 'from_contract',
@@ -38,9 +56,9 @@ hype.subscribe('cw20-transfer', createPersistentIndexer(Cw20TransferLog, async (
           amount: match[4].value,
         }),
       ),
-    ]);
-  },
-));
+    ])
+  ),
+);
 await hype.start();
 ```
 
@@ -50,7 +68,7 @@ Replace `BlockPoller` with `BlockBackFiller`.
 
 ```ts
 const datasource = new BlockBackFiller(
-  new HiveBlockFetcher('https://hive.terra.dev/graphql'),
+  new FCDBlockFetcher('https://hive.terra.dev/graphql'),
   4980471, 4981423,
 );
 const hype = new Hype(datasource);
