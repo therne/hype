@@ -1,6 +1,7 @@
 import { Block, flattenEventsInBlock } from '../../block';
 import { ReturningLogFinderMapper } from '@terra-money/log-finder';
 
+/** @deprecated use [extractEventsInBlock] instead. */
 export function findAndParseEvents<T>(block: Block, logFinders: ReturningLogFinderMapper<T>[]): T[] {
   return flattenEventsInBlock(block)
     .map((event) => logFinders.map((fn) => fn(event)))
