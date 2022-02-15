@@ -98,10 +98,14 @@ export default class HiveBlockFetcher implements BlockFetcher {
   }
 
   isBlockNotFoundError(err: ClientError): boolean {
-    return !!(
-      err?.response?.errors &&
-      (err.response.errors[0].message === 'Request failed with status code 500' ||
-        err.response.errors[0].message.toLowerCase().includes('not found'))
+    if (!err?.response?.errors) {
+      return false;
+    }
+    const errMsg = err?.response?.errors[0].message;
+    return (
+      errMsg === 'Request failed with status code 500' ||
+      errMsg === 'Request failed with status code 400' ||
+      errMsg.toLowerCase().includes('not found')
     );
   }
 }
