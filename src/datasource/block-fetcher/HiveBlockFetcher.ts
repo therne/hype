@@ -1,10 +1,7 @@
 import { ClientError, gql, GraphQLClient } from 'graphql-request';
-import { Block, Txn } from './block';
-import { log } from './logger';
-
-export interface BlockFetcher {
-  fetchBlockAt(height: number): Promise<Block | undefined>;
-}
+import { Block, Txn } from '../../block';
+import { log } from '../../logger';
+import BlockFetcher from './BlockFetcher';
 
 const HIVE_COLUMBUS_5 = 'https://hive.terra.dev/graphql';
 
@@ -62,7 +59,7 @@ interface FetchBlockHeaderQueryResponse {
   };
 }
 
-export class HiveBlockFetcher implements BlockFetcher {
+export default class HiveBlockFetcher implements BlockFetcher {
   private readonly client: GraphQLClient;
 
   constructor(endpoint = HIVE_COLUMBUS_5) {

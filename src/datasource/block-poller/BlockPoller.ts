@@ -1,8 +1,8 @@
-import { Block } from '../block';
+import { Block } from '../../block';
 import { BlockFetcher } from '../block-fetcher';
-import BlockDataSource from './BlockDataSource';
+import BlockDataSource from '../BlockDataSource';
 import { LastSyncedHeightRepository } from './LastSyncedHeightRepository';
-import { log } from '../logger';
+import { log } from '../../logger';
 
 export interface BlockPollerOptions {
   intervalInMs: number;

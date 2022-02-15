@@ -1,7 +1,7 @@
-import BlockDataSource from './BlockDataSource';
+import BlockDataSource from '../BlockDataSource';
 import { BlockFetcher } from '../block-fetcher';
-import { Block } from '../block';
-import { log } from '../logger';
+import { Block } from '../../block';
+import { log } from '../../logger';
 
 export interface BlockBackFillerOptions {
   interval: number;

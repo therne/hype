@@ -1,6 +1,6 @@
-import { HiveBlockFetcher } from '../src';
+import { HiveBlockFetcher } from '../../../src';
 
-describe('Testing BlockFetcher', () => {
+describe('Testing HiveBlockFetcher', () => {
   const blockFetcher = new HiveBlockFetcher();
 
   it('should return block if block is available', async () => {

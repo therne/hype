@@ -1,6 +1,5 @@
-import { Block, Hype } from '../src';
+import { Block, createStaticBlockDataSource, Hype } from '../src';
 import fixtureBlock from './fixtures/5036118.json';
-import { createStaticBlockDataSource } from '../src/datasource/BlockDataSource';
 import { createReturningLogFinder } from '@terra-money/log-finder';
 import { findAndParseEvents } from '../src/extensions/log-finder';
 
@@ -51,7 +50,7 @@ describe('Testing Hype', () => {
 
   describe('eventHandlers()', () => {
     test('on error, it should catch errors from subscriber', async () => {
-      let capture: {err: Error, subscriptionId: string, block: Block} | undefined;
+      let capture: { err: Error; subscriptionId: string; block: Block } | undefined;
       hype.on('error', (err, subscriptionId, block) => {
         capture = { err, subscriptionId, block };
       });

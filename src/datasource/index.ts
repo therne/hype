@@ -1,4 +1,5 @@
-export { default as BlockDataSource } from './BlockDataSource';
-export { default as BlockBackFiller } from './BlockBackFiller';
-export { default as BlockPoller, BlockPollerOptions } from './BlockPoller';
+export { default as BlockDataSource, createStaticBlockDataSource } from './BlockDataSource';
+export * from './block-backfiller';
+export * from './block-poller';
 export * from './load-transactions-of-account';
+export * from './block-fetcher';
