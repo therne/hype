@@ -2,7 +2,7 @@ import { createRealtimeHype } from '../src';
 import { extractEventsInBlock } from '../src/extensions/log-finder';
 import { createCw20TransferLogFinder } from '../src/extensions/cw20';
 
-const anchorTokenTransferFinder = createCw20TransferLogFinder('terra1747mad58h0w4y589y3sk84r5efqdev9q4r02pc');
+const anchorTokenTransferFinder = createCw20SendLogFinder('terra14z56l0fp2lsf86zy3hty2z47ezkhnthtr9yq76');
 
 async function main() {
   const hype = await createRealtimeHype();

@@ -12,12 +12,12 @@ An experimental indexer framework. Allows subscribing on-chain events from Terra
 
 ```ts
 const hype = await createRealtimeHype();
-const ancTransferFinder = createCw20TransferLogFinder('terra1747mad58h0w4y589y3sk84r5efqdev9q4r02pc');
+const ancTransferFinder = createCw20TransferLogFinder('terra14z56l0fp2lsf86zy3hty2z47ezkhnthtr9yq76');
 
 hype.subscribe('anchor-transfer', async (block) => {
   extractEventsInBlock(block, [ancTransferFinder])
     .forEach(({ txHash, event: { from, to, amount } }) => {
-      console.log(`Transfer ${amount} ANC from ${from} to ${to}`);
+      console.log(`Sent ${amount} ANC from ${from} to ${to}`);
       console.log(` -> https://finder.terra.money/mainnet/tx/${txHash}`);
     });
 });
