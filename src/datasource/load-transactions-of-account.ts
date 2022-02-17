@@ -2,7 +2,7 @@ import BlockDataSource from './BlockDataSource';
 import { Block, Txn } from '../block';
 import { log } from '../logger';
 import axios from 'axios';
-import { every, groupBy } from 'lodash';
+import { every, groupBy, max, min } from 'lodash';
 
 const FCD_MAINNET = 'https://fcd.terra.dev';
 
@@ -61,7 +61,18 @@ export const loadTransactionsOfAccount = (
           }));
 
           if (every(blocks, ({ height }) => height < fromBlock)) {
+            const maxHeight = max(blocks.map(({ height }) => height));
+            log(
+              'trace',
+              'fcd-backfiller',
+              `block height (max ${maxHeight}) is lower than ${fromBlock}. quitting...`,
+              {},
+            );
             return;
+          }
+          if (every(blocks, ({ height }) => height >= toBlock)) {
+            const minHeight = min(blocks.map(({ height }) => height));
+            log('trace', 'fcd-backfiller', `block height (min ${minHeight}) is greater than ${toBlock}. skipping`, {});
           }
 
           const blocksInRange = blocks.filter(({ height }) => fromBlock <= height && height < toBlock);
