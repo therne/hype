@@ -21,3 +21,5 @@ export function loadFixtureBlock(fixtureBlock: Record<string, any>): Block {
     transactions: fixtureBlock.transactions,
   };
 }
+
+export const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
