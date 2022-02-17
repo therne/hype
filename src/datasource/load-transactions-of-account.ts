@@ -68,9 +68,7 @@ export const loadTransactionsOfAccount = (
           for (const block of blocksInRange) {
             yield block;
           }
-          if (blocksInRange.length === 0) {
-            await sleep(sleepMs);
-          }
+          await sleep(sleepMs);
           currentOffset = next;
           page++;
           retry = 0;
@@ -80,6 +78,9 @@ export const loadTransactionsOfAccount = (
             throw err;
           }
           const error = (err as Error).message;
+          if (error.includes('429')) {
+            await sleep(60000);
+          }
           log('error', 'fcd-backfiller', `load failed`, { offset: currentOffset, error });
           retry++;
 
