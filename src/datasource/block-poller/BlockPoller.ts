@@ -3,6 +3,7 @@ import { BlockFetcher } from '../block-fetcher';
 import BlockDataSource from '../BlockDataSource';
 import { LastSyncedHeightRepository } from './LastSyncedHeightRepository';
 import { log } from '../../logger';
+import { assignOptions } from '../../utils';
 
 export interface BlockPollerOptions {
   intervalInMs: number;
@@ -22,7 +23,7 @@ export default class BlockPoller implements BlockDataSource {
     public lastSyncedHeightRepository: LastSyncedHeightRepository,
     options: Partial<BlockPollerOptions> = {},
   ) {
-    this.options = Object.assign(defaultBlockPollerOptions, options);
+    this.options = assignOptions(defaultBlockPollerOptions, options);
   }
 
   async *blocks(): AsyncGenerator<Block> {

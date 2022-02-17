@@ -2,7 +2,7 @@ import { Block } from '../../block';
 import { SubscriberFn } from '../../Hype';
 import { SaveOptions } from 'typeorm/repository/SaveOptions';
 import { log } from '../../logger';
-import { BufferedQueue } from '../../utils';
+import { assignOptions, BufferedQueue } from '../../utils';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type ObjectType<T> = { new (): T } | Function;
@@ -29,7 +29,7 @@ export function createPersistentIndexer<T>(
   mapper: (block: Block) => Promise<T[]>,
   options: Partial<PersistentIndexerOptions> = {},
 ): SubscriberFn {
-  const { useBatch, batchFlushIntervalInMs, maxItemsPerBatch } = Object.assign(
+  const { useBatch, batchFlushIntervalInMs, maxItemsPerBatch } = assignOptions(
     defaultPersistentIndexerOptions,
     options,
   );

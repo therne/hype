@@ -2,6 +2,7 @@ import BlockDataSource from '../BlockDataSource';
 import { BlockFetcher } from '../block-fetcher';
 import { Block } from '../../block';
 import { log } from '../../logger';
+import { assignOptions } from '../../utils';
 
 export interface BlockBackFillerOptions {
   interval: number;
@@ -24,7 +25,7 @@ export default class BlockBackFiller implements BlockDataSource {
     public to: number,
     options: Partial<BlockBackFillerOptions> = {},
   ) {
-    this.options = Object.assign(defaultBlockPollerOptions, options);
+    this.options = assignOptions(defaultBlockPollerOptions, options);
   }
 
   async *blocks(): AsyncGenerator<Block> {
