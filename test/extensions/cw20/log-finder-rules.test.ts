@@ -13,6 +13,6 @@ describe('createCw20SendLogFinder()', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const events = extractEventsInBlock(block!, [tokenSendFinder]);
-    expect(events).toHaveLength(1);
+    expect(events).toHaveLength(2);
   });
 });
