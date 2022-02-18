@@ -1,20 +1,11 @@
 import BlockDataSource from './BlockDataSource';
-import { Block, Txn } from '../block';
+import { Block } from '../block';
 import { log } from '../logger';
-import axios from 'axios';
 import { every, groupBy, max, min } from 'lodash';
-import { assignOptions } from '../utils';
-
-const FCD_MAINNET = 'https://fcd.terra.dev';
-
-interface FCDResponse {
-  next?: number;
-  limit: number;
-  txs: Txn[];
-}
+import { assignOptions, FCDClient } from '../utils';
 
 export interface LoadTransactionsOfAccountOptions {
-  endpoint: string;
+  endpoint?: string;
   fromBlock: number;
   toBlock: number;
   sleepMs: number;
@@ -24,7 +15,6 @@ export interface LoadTransactionsOfAccountOptions {
 }
 
 const defaultOptions: LoadTransactionsOfAccountOptions = {
-  endpoint: FCD_MAINNET,
   fromBlock: 0,
   toBlock: Number.MAX_VALUE,
   sleepMs: 1000,
@@ -41,6 +31,8 @@ export const loadTransactionsOfAccount = (
 
   return {
     async *blocks(): AsyncGenerator<Block> {
+      const fcd = new FCDClient(endpoint);
+
       let currentOffset: number | undefined = offset;
       let page = 0;
       let retry = 0;
@@ -48,8 +40,7 @@ export const loadTransactionsOfAccount = (
         try {
           log('info', 'fcd-backfiller', `loading page #${page}`, { offset: currentOffset });
 
-          const resp = await axios.get(`${endpoint}/v1/txs?offset=${currentOffset}&limit=${limit}&account=${account}`);
-          const { next, txs } = resp.data as FCDResponse;
+          const { next, txs } = await fcd.getTransactionsOf(account, { offset: currentOffset, limit });
           if (txs.length === 0) {
             return;
           }
@@ -81,7 +72,7 @@ export const loadTransactionsOfAccount = (
             yield block;
           }
           await sleep(sleepMs);
-          currentOffset = next;
+          currentOffset = next as number | undefined;
           page++;
           retry = 0;
         } catch (err) {
