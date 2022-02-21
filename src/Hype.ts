@@ -11,6 +11,7 @@ interface HypeEvents {
   callSubscriber: (subscriptionId: string, block: Block) => void;
   postCallSubscriber: (subscriptionId: string, block: Block) => void;
   error: (err: Error, subscriptionId: string, block: Block) => void;
+  finish: () => void;
 }
 
 export class Hype extends TypedEmitter<HypeEvents> {
@@ -39,14 +40,14 @@ export class Hype extends TypedEmitter<HypeEvents> {
     return this;
   }
 
-  unsubscribe(id: string) {
+  unsubscribe(id: string): void {
     if (!this.subscriptions[id]) {
       throw new Error(`subscription '${id}' is not found`);
     }
     delete this.subscriptions[id];
   }
 
-  async start() {
+  async start(): Promise<void> {
     for await (const block of this.dataSource.blocks()) {
       this.emit('block', block);
 
@@ -64,5 +65,6 @@ export class Hype extends TypedEmitter<HypeEvents> {
 
       this.emit('postBlock', block);
     }
+    this.emit('finish');
   }
 }
