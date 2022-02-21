@@ -1,7 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { Block, Txn } from '../block';
 import { log } from '../logger';
-import { stat } from 'fs';
 
 const FCD_ENDPOINT_PER_CHAIN: { [chainId: string]: string } = {
   'columbus-5': 'https://fcd.terra.dev/',
@@ -82,7 +81,6 @@ export class FCDClient {
           Expires: '0',
         },
       });
-      console.log(`HTTP ${status} -> ${data}`);
 
       return { result: data };
     } catch (err) {
