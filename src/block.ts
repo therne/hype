@@ -34,7 +34,7 @@ export interface TxnEvent {
   }[];
 }
 
-export const flattenEventsInTransaction = (tx: Txn): TxnEvent[] => tx.logs.flatMap((log) => log.events);
+export const flattenEventsInTransaction = (tx: Txn): TxnEvent[] => (tx.logs ?? []).flatMap((log) => log.events);
 
 export const flattenEventsInBlock = (block: Block): TxnEvent[] =>
   block.transactions.flatMap(flattenEventsInTransaction);
