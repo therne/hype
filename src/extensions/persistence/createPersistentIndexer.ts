@@ -57,3 +57,7 @@ export function createPersistentIndexer<T>(
     });
   };
 }
+
+export async function flushBatchPersistenceItems(): Promise<void> {
+  await BufferedQueue.flushAll();
+}

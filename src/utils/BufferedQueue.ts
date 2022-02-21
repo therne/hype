@@ -1,15 +1,19 @@
-import { log } from '../logger';
+const globalFlushHandlers: (() => Promise<void>)[] = [];
 
 export default class BufferedQueue<T> {
   queue: T[] = [];
   lastFlushedAt?: number;
 
   constructor(
-    public flushCallback: (items: T[]) => Promise<unknown>,
-    public flushIntervalInMs: number,
-    public maxItems: number,
+    public readonly flushCallback: (items: T[]) => Promise<unknown>,
+    public readonly flushIntervalInMs: number,
+    public readonly maxItems: number,
   ) {
-    ['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach((signal) => process.on(signal, () => this.exit(signal)));
+    globalFlushHandlers.push(() => this.flush());
+  }
+
+  static async flushAll(): Promise<void> {
+    await Promise.all(globalFlushHandlers.map((handler) => handler()));
   }
 
   async push(items: T[]) {
@@ -35,14 +39,5 @@ export default class BufferedQueue<T> {
     await this.flushCallback(this.queue);
     this.queue = [];
     this.lastFlushedAt = Date.now();
-  }
-
-  private async exit(signal: string) {
-    log('info', 'BufferedQueue', 'received', {
-      signal,
-      itemsRemaining: this.queue.length,
-    });
-    if (this.queue.length) await this.flush();
-    process.exit(0);
   }
 }
