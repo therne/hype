@@ -1,7 +1,8 @@
-import { Block } from './block';
-import { log } from './logger';
 import { TypedEmitter } from 'tiny-typed-emitter';
+import { Block } from './block';
 import { BlockDataSource } from './datasource';
+import { flushBatchPersistenceItems } from './extensions/persistence';
+import { log } from './logger';
 
 export type SubscriberFn = (block: Block, subscriptionId: string) => Promise<void>;
 
@@ -33,6 +34,9 @@ export class Hype extends TypedEmitter<HypeEvents> {
         error: err.stack,
       });
     });
+
+    // flush persistence items
+    this.on('finish', () => flushBatchPersistenceItems());
   }
 
   subscribe(id: string, subscription: SubscriberFn): Hype {
