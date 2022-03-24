@@ -1,9 +1,9 @@
-import 'reflect-metadata';
-import { BlockBackFiller, HiveBlockFetcher, Hype } from '../../src';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { createPersistentIndexer } from '../../src/extensions/persistence';
-import { findAndParseEvents } from '../../src/extensions/log-finder';
 import { createReturningLogFinder } from '@terra-money/log-finder';
+import 'reflect-metadata';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BlockBackFiller, HiveBlockFetcher, Hype } from '../../src';
+import { extractEventsInBlock } from '../../src/extensions/log-finder';
+import { createTypeORMIndexer } from '../../src/extensions/typeorm';
 import { setupTestORM } from '../test-utils';
 
 const TEST_BLOCK = 5036118;
@@ -31,8 +31,8 @@ describe('E2E test', () => {
     await new Hype(datasource)
       .subscribe(
         'airdrop-claim-log',
-        createPersistentIndexer(AirdropClaimLog, async (block) =>
-          findAndParseEvents(block, [
+        createTypeORMIndexer(AirdropClaimLog, async (block) =>
+          extractEventsInBlock(block, [
             createReturningLogFinder(
               {
                 type: 'from_contract',
@@ -44,14 +44,13 @@ describe('E2E test', () => {
                   ['amount'],
                 ],
               },
-              (_, match) =>
-                AirdropClaimLog.create({
-                  stage: Number(match[2].value),
-                  address: match[3].value,
-                  amount: match[4].value,
-                }),
+              (_, match) => ({
+                stage: Number(match[2].value),
+                address: match[3].value,
+                amount: match[4].value,
+              }),
             ),
-          ]),
+          ]).map(({ event }) => event),
         ),
       )
       .start();
