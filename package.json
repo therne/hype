@@ -1,5 +1,5 @@
 {
-  "name": "@vista/hype",
+  "name": "@therne/hype",
   "version": "0.3.0",
   "description": "On-chain Event Subscriber Framework for Terra Blockchain",
   "repository": "https://github.com/therne/hype.git",

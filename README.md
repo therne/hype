@@ -1,11 +1,12 @@
 ![Hype](./docs/Hype-Logo.svg)
 
-An experimental indexer framework. Allows subscribing on-chain events from Terra Blockchain.
+Production-ready Indexer framework for Terra blockchain. Allows subscribing on-chain events from Terra,
+and provides utilities for maintenances like back-filling previous data.
 
 ## Getting Started
 
 ```
-$ yarn add @vista/hype
+$ yarn add @therne/hype
 ```
 
 ## Architecture Overview
