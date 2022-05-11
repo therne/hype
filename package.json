@@ -1,9 +1,9 @@
 {
-  "name": "@pylon-protocol/hype",
+  "name": "@vista/hype",
   "version": "0.3.0",
   "description": "On-chain Event Subscriber Framework for Terra Blockchain",
-  "repository": "https://github.com/pylon-protocol/hype.git",
-  "author": "Pylon Team",
+  "repository": "https://github.com/therne/hype.git",
+  "author": "Hyojun Kim",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

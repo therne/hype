@@ -2,6 +2,12 @@
 
 An experimental indexer framework. Allows subscribing on-chain events from Terra Blockchain.
 
+## Getting Started
+
+```
+$ yarn add @vista/hype
+```
+
 ## Architecture Overview
 
 ![Hype Diagram](./docs/Hype-Diagram.svg)
