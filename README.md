@@ -45,7 +45,7 @@ hype.subscribe(
   'cw20-transfer',
   createPersistentIndexer(Cw20TransferLog, async (block) =>
     extractEventsInBlock(block, [
-      createReturningLogFinderRule(
+      createReturningLogFinder(
         {
           type: 'from_contract',
           attributes: [
